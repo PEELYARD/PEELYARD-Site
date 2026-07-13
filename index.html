@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>[PEELYARD]</title>
+
+  <!-- Browser tab icon -->
+  <link rel="icon" type="image/png" href="peelyard-favicon.png" />
+  <link rel="apple-touch-icon" href="peelyard-favicon.png" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #030303;
+      color: #d8c77a;
+      font-family: "Courier New", Courier, monospace;
+      overflow-x: hidden;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      overflow: hidden;
+      padding: 44px;
+      background: #030303;
+    }
+
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    .hero-darken {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        radial-gradient(circle at center, rgba(0,0,0,0.05), rgba(0,0,0,0.55)),
+        linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.85));
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      opacity: 0.16;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.45'/%3E%3C/svg%3E");
+    }
+
+    .scanline {
+      position: fixed;
+      inset: 0;
+      z-index: 51;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.025),
+        rgba(255,255,255,0.025) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+      opacity: 0.14;
+    }
+
+    .top-left,
+    .top-right {
+      position: absolute;
+      z-index: 5;
+      top: 44px;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      line-height: 1.5;
+      text-transform: uppercase;
+      color: rgba(216,199,122,0.82);
+    }
+
+    .top-left { left: 44px; }
+    .top-right { right: 44px; }
+
+    /* Visible PEELYARD logo at the top center */
+    .brand-logo {
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      width: 104px;
+      height: 104px;
+      object-fit: contain;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 14px rgba(234, 174, 31, 0.24));
+      opacity: 0.92;
+    }
+
+    .title-wrap {
+      position: relative;
+      z-index: 4;
+      min-height: 86vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding-top: 80px;
+    }
+
+    h1 {
+      font-size: clamp(40px, 7vw, 86px);
+      font-weight: 400;
+      letter-spacing: 0.42em;
+      color: #eadb91;
+      text-shadow:
+        0 0 18px rgba(234,219,145,0.38),
+        0 0 44px rgba(234,219,145,0.12);
+      animation: fadeIn 1.2s ease both;
+    }
+
+    .tagline {
+      margin-top: 36px;
+      color: rgba(232,223,181,0.88);
+      font-size: clamp(15px, 2vw, 19px);
+      letter-spacing: 0.3em;
+      line-height: 1.45;
+      text-transform: lowercase;
+      animation: fadeIn 1.5s ease both;
+      animation-delay: 0.25s;
+    }
+
+    .scroll {
+      margin-top: 92px;
+      display: inline-block;
+      color: rgba(232,223,181,0.6);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.24em;
+      animation: fadeIn 1.8s ease both;
+      animation-delay: 0.45s;
+    }
+
+    .arrow {
+      display: block;
+      margin-top: 15px;
+      font-size: 22px;
+    }
+
+    .tiles {
+      background: #030303;
+      padding: 62px 44px 34px;
+      position: relative;
+      z-index: 6;
+    }
+
+    .tile-grid {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .tile {
+      min-height: 310px;
+      padding: 28px;
+      border: 1px solid rgba(216,199,122,0.13);
+      background: linear-gradient(135deg, #111, #050505);
+      color: #eadb91;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      transition: 0.22s ease;
+    }
+
+    .tile:hover {
+      transform: translateY(-5px);
+      border-color: rgba(216,199,122,0.42);
+    }
+
+    .tile h2 {
+      font-size: 24px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .tile p {
+      margin-top: 18px;
+      color: rgba(232,223,181,0.66);
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: lowercase;
+    }
+
+    footer {
+      background: #030303;
+      padding: 34px 44px 48px;
+      color: rgba(232,223,181,0.44);
+      border-top: 1px solid rgba(216,199,122,0.24);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      line-height: 1.45;
+    }
+
+    footer div:nth-child(2) { text-align: center; }
+    footer div:nth-child(3) { text-align: right; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      .tile-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .hero { padding: 24px; }
+
+      .top-left,
+      .top-right {
+        top: 24px;
+        font-size: 10px;
+      }
+
+      .top-left { left: 24px; }
+      .top-right { right: 24px; }
+
+      .brand-logo {
+        top: 18px;
+        width: 72px;
+        height: 72px;
+      }
+
+      h1 {
+        letter-spacing: 0.18em;
+        font-size: 34px;
+      }
+
+      .tagline { letter-spacing: 0.18em; }
+
+      .tiles { padding: 42px 18px 28px; }
+
+      .tile-grid { grid-template-columns: 1fr; }
+
+      .tile { min-height: 210px; }
+
+      footer {
+        grid-template-columns: 1fr;
+        text-align: left;
+        padding: 28px 22px 38px;
+      }
+
+      footer div:nth-child(2),
+      footer div:nth-child(3) {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="grain"></div>
+  <div class="scanline"></div>
+
+  <main class="hero">
+    <video class="hero-video" autoplay muted loop playsinline>
+      <source src="hero.mp4" type="video/mp4" />
+    </video>
+
+    <div class="hero-darken"></div>
+
+    <div class="top-left">
+      Archive Signal: Online<br />
+      Est. 2026
+    </div>
+
+    <!-- Your visible PEELYARD brand logo -->
+    <img
+      class="brand-logo"
+      src="peelyard-logo.png"
+      alt="PEELYARD logo"
+    />
+
+    <div class="top-right">001</div>
+
+    <section class="title-wrap">
+      <div>
+        <h1>[PEELYARD]</h1>
+
+        <div class="tagline">
+          lost things.<br />
+          found again.
+        </div>
+
+        <a class="scroll" href="#tiles">
+          [ scroll down ]
+          <span class="arrow">⌄</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <section class="tiles" id="tiles">
+    <div class="tile-grid">
+      <a href="#" class="tile">
+        <h2>// Archive</h2>
+        <p>coming soon</p>
+      </a>
+
+      <a href="#" class="tile">
+        <h2>// Garage</h2>
+        <p>coming soon</p>
+      </a>
+
+      <a href="#" class="tile">
+        <h2>// Broadcast</h2>
+        <p>coming soon</p>
+      </a>
+
+      <a href="#" class="tile">
+        <h2>// Shop</h2>
+        <p>coming soon</p>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      Recovering what<br />
+      shouldn't have been forgotten.
+    </div>
+
+    <div>
+      PEELYARD © 2026<br />
+      All rights reserved
+    </div>
+
+    <div>
+      Signal Strength<br />
+      ███████▒▒▒ 70%
+    </div>
+  </footer>
+</body>
+</html>
