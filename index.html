@@ -354,5 +354,44 @@
       ███████▒▒▒ 70%
     </div>
   </footer>
+<!-- CURSER CODE-->
+  <style>
+html {
+    cursor: url("stilllogo.cur"), auto;
+}
+</style>
+
+<script>
+const html = document.documentElement;
+
+let movingTimer;
+
+// Default cursor
+html.style.cursor = 'url("stilllogo.cur"), auto';
+
+// Mouse is moving
+document.addEventListener("mousemove", () => {
+    html.style.cursor = 'url("spinlogo.cur"), auto';
+
+    clearTimeout(movingTimer);
+
+    // If the mouse stops for 100ms, return to still
+    movingTimer = setTimeout(() => {
+        html.style.cursor = 'url("stilllogo.cur"), auto';
+    }, 100);
+});
+
+// Mouse button pressed
+document.addEventListener("mousedown", () => {
+    html.style.cursor = 'url("clicklogo.cur"), auto';
+});
+
+// Mouse button released
+document.addEventListener("mouseup", () => {
+    html.style.cursor = 'url("stilllogo.cur"), auto';
+});
+</script>
+<!--END CURSER CODE-->
+  
 </body>
 </html>
